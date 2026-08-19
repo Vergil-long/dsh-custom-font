@@ -1,0 +1,42 @@
+{
+  "name": "dsh-custom-font",
+  "version": "2.1.0",
+  "description": "自定义 DeepSeek Harness 界面字体/字号/加粗/颜色：像 Word 一样在设置里改，所见即所得，自动保存。Windows 下自动读取系统已装字体库。",
+  "type": "module",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "keywords": [
+    "deepseek",
+    "harness",
+    "dsh",
+    "dsh-plugin",
+    "font",
+    "typography",
+    "theme",
+    "windows"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": "./client/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "client",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ]
+}

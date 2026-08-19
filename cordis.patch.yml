@@ -1,0 +1,4 @@
+# dsh bundle patch: 把这个字体插件插进 profile 的插件列表
+- insert:
+    - id: dsh-custom-font
+      name: 'dsh-custom-font'
