@@ -1,18 +1,33 @@
 {
   "name": "dsh-custom-font",
-  "version": "2.1.0",
-  "description": "自定义 DeepSeek Harness 界面字体/字号/加粗/颜色：像 Word 一样在设置里改，所见即所得，自动保存。Windows 下自动读取系统已装字体库。",
+  "version": "3.0.0",
+  "description": "自定义 DeepSeek Harness 界面字体/字号/加粗/颜色与版式：像 Word 一样在设置里改，所见即所得，自动保存。自带 STIX2Text 与 Latin Modern Mono Light 字体，内置一套作者推荐排版；设置存到 ~/.dsh（换桌面外壳不丢）。Windows 下自动读取系统已装字体库。",
   "type": "module",
   "main": "lib/index.js",
   "license": "MIT",
+  "author": "Vergil-long",
+  "homepage": "https://github.com/Vergil-long/dsh-custom-font#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vergil-long/dsh-custom-font.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vergil-long/dsh-custom-font/issues"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "keywords": [
     "deepseek",
+    "deepseek-harness",
     "harness",
     "dsh",
     "dsh-plugin",
+    "plugin",
     "font",
     "typography",
     "theme",
+    "appearance",
     "windows"
   ],
   "dsh": {
@@ -35,8 +50,21 @@
   "files": [
     "lib",
     "client",
+    "assets",
     "cordis.patch.yml",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
-  ]
+  ],
+  "scripts": {
+    "test": "node test/manifest.test.mjs && node test/host.test.mjs && node test/client.test.mjs && node test/host-integration.test.mjs",
+    "test:manifest": "node test/manifest.test.mjs",
+    "test:host": "node test/host.test.mjs",
+    "test:client": "node test/client.test.mjs",
+    "test:integration": "node test/host-integration.test.mjs",
+    "probe:fonts": "node tools/read-fonts-probe.mjs"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
 }
