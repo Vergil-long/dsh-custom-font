@@ -1,3 +1,4 @@
+# DSH自定义字体插件     
 # dsh-custom-font
 
 一个 DeepSeek Harness（DSH）插件：像 Word 一样，在设置页里直观地修改界面文字的
