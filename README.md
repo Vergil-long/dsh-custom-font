@@ -95,6 +95,10 @@ npx @deepseek-ai/dsh plugin --profile web add dsh-custom-font
   - 注册一个 `settings.section` 设置页
   - 按当前设置生成一个 `<style>`（`!important` 作用于 `p / h1~h6 / code / blockquote / a / table` 等，
     并写 `--dsw-font-*` 变量）——样式内容变化时会替换，避免升级后新样式不生效
+  - 字体入口**同时写 `:root` 与 `body`**：2026-10 版 harness 在 body 上重新合成
+    `--dsw-font-family` / `--ds-font-family-code`（body 级会盖掉 :root 级），并把官方自定义入口改为
+    `--dsh-font-family-text` / `--dsh-font-family-code`。插件在 body 上带 `!important` 写这两组变量
+    （压过主题系统写进 body 内联样式的声明），`:root` 上的老入口保留给旧版本
   - 内置字体以 `@font-face` + blob URL 注入，`font-display: swap`
   - 启动时优先读宿主设置文件；读到旧版 localStorage 里的设置会自动迁移上去
 - **设置文件**：`~/.dsh/dsh-custom-font/settings.json`（`$DSH_HOME` 优先）。

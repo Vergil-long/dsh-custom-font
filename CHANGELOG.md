@@ -2,7 +2,28 @@
 
 本项目遵循语义化版本。
 
-## [3.0.0] - 2026-09-16
+## [3.1.0] - 2026-10-17
+
+### 修复（适配 2026-10 版 harness）
+- **左侧会话栏与界面字体回退成默认字体**：新版 harness 的 base.css 把 `--dsw-font-family` / `--ds-font-family-code`
+  的合成声明从 `:root` 挪到了 **body** 上（`var(--dsh-font-family-text, 内置栈), 内置栈`），
+  body 级声明会把本插件写在 `:root` 的覆盖**整层盖掉**（就近继承，与 `!important` 无关）——
+  于是靠"继承 body 字体"的左侧会话栏、按钮、菜单、设置页等全部回到默认字体。
+  现在字体入口在 body 上用 `!important` 再写一遍（能压过主题系统 ThemePresenter 写进 body 内联样式的非 important 声明），
+  `:root` 上的老入口保留，老版本 harness 照常生效。
+- **接入新版官方字体自定义入口**：新版主题系统的字体清单入口是 `--dsh-font-family-text`（正文/界面）
+  与 `--dsh-font-family-code`（代码）。插件现在同时写这两个官方变量与旧变量 `--dsw-font-family` / `--ds-font-family-code`，
+  新旧版本通吃。
+- **界面字号梯子对齐新版**：`uiOn`（自定义界面文字）开启时，梯子变量从 5 个扩到新版全量 13 个——
+  `xl-24 / l-20 / m-18 / base-16 / s-14 / xs-13 / xxs-12 / xxxs-11` 及各自的 `*-strong` 变体
+  （strong 比用户选的字重重一档，保留界面强调层次），并同样改写在 body 上。
+
+### 说明
+- 新版 harness 的正文/代码字号有自己的设置项（`--dsh-content-font-size` / `--dsh-code-font-size`，
+  由主题系统写进 body 内联样式），与本插件互补：插件继续用元素级 `!important` 规则管正文/标题/代码的
+  字体与字号，不与主题系统的字号设置打架。
+
+## [3.0.0] - 2026-09-15
 
 ### 新增
 - **插件内置字体**：自带 STIX2Text（4 个字重）与 Latin Modern Mono Light（3 个字重），

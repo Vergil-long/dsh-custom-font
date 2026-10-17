@@ -431,6 +431,43 @@ await test('界面文字跟随正文：--dsw-font-family 被指到正文栈', ()
   assert.equal(/--dsw-font-family/.test(css({ uiFollow: false, uiOn: false })), false);
 });
 
+await test('2026-10 版 harness 适配：字体入口写到 body 上（官方 --dsh-font-family-text / --dsh-font-family-code）', () => {
+  const rules = css({ uiFollow: true });
+  // body 块里必须有官方自定义入口 + 直接覆盖 --dsw-font-family（body 级合成声明会盖掉 :root 级）
+  const bodyBlock = /body \{\n(?:  [^\n]*\n)*\}/.exec(rules)?.[0] ?? '';
+  assert.ok(bodyBlock, '应当有 body 变量块');
+  assert.match(bodyBlock, /--dsh-font-family-text: "STIX2Text", "STIXTwoText", "仿宋_GB2312"[^;]*serif !important;/,
+    'body 上应当写官方入口 --dsh-font-family-text（ThemePresenter 的内联样式会被 !important 压过）');
+  assert.match(bodyBlock, /--dsw-font-family: "STIX2Text", "STIXTwoText", "仿宋_GB2312"[^;]*serif !important;/);
+  assert.match(bodyBlock, /--dsh-font-family-code: "Latin Modern Mono Light", "LMMonoLt10-Regular", monospace !important;/);
+  assert.match(bodyBlock, /--ds-font-family-code: "Latin Modern Mono Light", "LMMonoLt10-Regular", monospace !important;/);
+  // :root 老入口也保留（老版本 harness 靠它）
+  const rootBlock = /:root \{\n(?:  [^\n]*\n)*\}/.exec(rules)?.[0] ?? '';
+  assert.match(rootBlock, /--dsw-font-family:/);
+  assert.match(rootBlock, /--ds-font-family-code:/);
+  // 不跟随界面（uiFollow/uiOn 全关）时，不写任何 UI 字体入口，代码字体照写
+  const off = css({ uiFollow: false, uiOn: false });
+  assert.equal(/--dsh-font-family-text/.test(off), false);
+  assert.equal(/--dsw-font-family(?!-)/.test(off), false);
+  assert.match(off, /--dsh-font-family-code:/);
+});
+
+await test('界面字号梯子：uiOn 时写全 2026-10 版的层级（含 strong 变体与 xl/l/m），且写在 body 块里', () => {
+  const rules = css({ uiOn: true, uiSize: 16, uiWeight: 500 });
+  const bodyBlock = /body \{\n(?:  [^\n]*\n)*\}/.exec(rules)?.[0] ?? '';
+  for (const name of ['xl-24', 'l-20', 'm-18', 'base-16', 'base-strong-16', 's-14', 's-strong-14',
+    'xs-13', 'xs-strong-13', 'xxs-12', 'xxs-strong-12', 'xxxs-11', 'xxxs-strong-11']) {
+    assert.ok(bodyBlock.includes('--dsw-font-' + name + ':'), `body 块里应当有 --dsw-font-${name}`);
+  }
+  // 基准层 16px/500，strong 变体重一档（600）
+  assert.match(bodyBlock, /--dsw-font-base-16: 500 16px\/24px /);
+  assert.match(bodyBlock, /--dsw-font-base-strong-16: 600 16px\/24px /);
+  // 层级随 uiSize 缩放（s-14 = uiSize-2）
+  assert.match(bodyBlock, /--dsw-font-s-14: 500 14px\/21px /);
+  // uiOn 关闭时梯子不出现
+  assert.equal(/--dsw-font-base-16:/.test(css({ uiOn: false })), false);
+});
+
 await test('模块加载即注入样式，且不需要打开设置页', async () => {
   await flush();
   const style = styleTag();

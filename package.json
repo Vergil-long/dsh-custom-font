@@ -1,6 +1,6 @@
 {
   "name": "dsh-custom-font",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "自定义 DeepSeek Harness 界面字体/字号/加粗/颜色与版式：像 Word 一样在设置里改，所见即所得，自动保存。自带 STIX2Text 与 Latin Modern Mono Light 字体，内置一套作者推荐排版；设置存到 ~/.dsh（换桌面外壳不丢）。Windows 下自动读取系统已装字体库。",
   "type": "module",
   "main": "lib/index.js",

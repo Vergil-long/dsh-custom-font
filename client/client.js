@@ -448,13 +448,22 @@ window.__ModuleLoader__.load({
       lines.push("}");
     }
 
-    // 界面文字的字号/字重：按 5 个层级（base/s/xs/xxs/xxxs）写入 --dsw-font-* 变量。
+    // 界面文字的字号/字重：写入 --dsw-font-* 字号梯子变量（必须写在 body 上，见 buildCss 里的说明）。
+    // 层级清单对齐 2026-10 版 harness 的梯子：xl-24 / l-20 / m-18 / base-16 / s-14 / xs-13 / xxs-12 / xxxs-11，
+    // 每级再带一个 *-strong 变体（比用户选的字重重一档，保留界面原有的强调层次）。
+    // 老版本 harness 只消费其中 base/s/xs/xxs/xxxs 五个——多写的变量它不读，无害。
     function uiFontVars(lines, stackValue, size, weight) {
       var s = clampSize(size);
       var w = clampWeight(weight);
-      [["base-16", 0], ["s-14", 2], ["xs-13", 3], ["xxs-12", 4], ["xxxs-11", 5]].forEach(function (t) {
+      var strong = clampWeight(w + 100);
+      [["xl-24", 8, 0], ["l-20", 4, 0], ["m-18", 0, 0],
+       ["base-16", 0, 0], ["base-strong-16", 0, 1],
+       ["s-14", 2, 0], ["s-strong-14", 2, 1],
+       ["xs-13", 3, 0], ["xs-strong-13", 3, 1],
+       ["xxs-12", 4, 0], ["xxs-strong-12", 4, 1],
+       ["xxxs-11", 5, 0], ["xxxs-strong-11", 5, 1]].forEach(function (t) {
         var px = Math.max(8, s - t[1]);
-        lines.push("  --dsw-font-" + t[0] + ": " + w + " " + px + "px/" + Math.round(px * 1.5) + "px " + stackValue + " !important;");
+        lines.push("  --dsw-font-" + t[0] + ": " + (t[2] ? strong : w) + " " + px + "px/" + Math.round(px * 1.5) + "px " + stackValue + " !important;");
       });
     }
 
@@ -485,13 +494,34 @@ window.__ModuleLoader__.load({
         if (face) lines.push(face);
       }
 
+      // ── 字体入口：:root 与 body 各写一份 ─────────────────────────
+      // 老版本 harness：字体变量只声明在 :root 上 → 写 :root 就够。
+      // 2026-10 版起：harness 的 base.css 在 **body** 上重新合成
+      //   --dsw-font-family: var(--dsh-font-family-text, 内置栈), 内置栈
+      //   --ds-font-family-code: var(--dsh-font-family-code, 内置栈), 内置栈
+      // body 级声明会把 :root 级完全盖掉（与 !important 无关，是就近继承），
+      // 而官方自定义入口换成了 --dsh-font-family-text / --dsh-font-family-code
+      // （宿主主题系统 ThemePresenter 还会把它们写进 body 的**内联样式**）。
+      // 所以必须在 body 上再写一份并带 !important（样式表 !important 能压过内联非 important），
+      // 否则左侧会话栏、按钮、菜单这些靠"继承 body 字体"的地方会全部回退成默认字体。
       lines.push(":root {");
       if (s.uiOn) {
         lines.push("  --dsw-font-family: " + uiStack + " !important;");
-        uiFontVars(lines, uiStack, s.uiSize, s.uiWeight);
       } else if (s.uiFollow) {
         lines.push("  --dsw-font-family: " + body + " !important;");
       }
+      lines.push("  --ds-font-family-code: " + code + " !important;");
+      lines.push("}");
+      lines.push("body {");
+      if (s.uiOn) {
+        lines.push("  --dsh-font-family-text: " + uiStack + " !important;");
+        lines.push("  --dsw-font-family: " + uiStack + " !important;");
+        uiFontVars(lines, uiStack, s.uiSize, s.uiWeight);
+      } else if (s.uiFollow) {
+        lines.push("  --dsh-font-family-text: " + body + " !important;");
+        lines.push("  --dsw-font-family: " + body + " !important;");
+      }
+      lines.push("  --dsh-font-family-code: " + code + " !important;");
       lines.push("  --ds-font-family-code: " + code + " !important;");
       lines.push("}");
 
